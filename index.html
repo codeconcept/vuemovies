@@ -47,8 +47,10 @@
             {{ movie.year | recent | highlight }} 
         </div>    
 
-        <wikipedia-search :search-term="titleToSearchOnWikipedia"></wikipedia-search>
-
+        <wikipedia-search :search-term="titleToSearchOnWikipedia" v-on:moviesreceived="displayMoviesFromAPI"></wikipedia-search>
+        <div v-for="movie in moviesFromAPI">
+            {{ movie }}
+        </div>
     </div>
     <script>
         'use strict';
@@ -79,27 +81,30 @@
                     // vueCreatorFullName: this.vueCreator.firstName + ' ' + this.creator.lastName  
                     newMovieTitle: '',
                     nightMode: false,
-                    titleToSearchOnWikipedia: ''       
+                    titleToSearchOnWikipedia: '',
+                    moviesFromAPI: []       
                 },
                 components: {
                     'wikipedia-search': {
                         data: function() {
                             return {
-                                movieDBurl: 'https://api.themoviedb.org/3/search/movie?api_key=',
-                                moviesFromAPI: []
+                                movieDBurl: 'https://api.themoviedb.org/3/search/movie?api_key='
+                                
                             }
                         },
                         template: '<div><input type="text" :searchTerm="this.searchTerm" :value="this.searchTerm"><button v-on:click="searchWikipedia()">chercher</button></div>',
                         methods: {
                             searchWikipedia: function() {
                                 // var url = 'https://fr.wikipedia.org/wiki/' + this.searchTerm;
-                                var API_KEY = 'your_key'
+                                var API_KEY = 'your_key';
                                 var query = '&query=' + this.searchTerm; 
                                 var url = this.movieDBurl + API_KEY + query + '&language=fr-FR';
 
+                                var self = this;
                                 axios.get(url)
                                         .then(function (response) {
                                             console.log(response);
+                                            self.$emit('moviesreceived', response.data.results);
                                         })
                                         .catch(function (error) {
                                             console.log(error);
@@ -126,13 +131,16 @@
                     },
                     showCreatorFullName: function() {
                         return this.vueCreator.firstName + ' ' + this.vueCreator.lastName;
+                    },
+                    displayMoviesFromAPI: function(data) {
+                        console.log(data);
+                        this.moviesFromAPI = data;
                     }
                 },
                 computed: {
                     spendOnVOD: function() {                    
                         var self = this;
                         var oldMovies = this.movies.filter(function(movie){  
-                            // console.log('this', this);
                             return movie.year < self.recentYear;
                         });
                         return oldMovies.length * this.vodPriceSD;
