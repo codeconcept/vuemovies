@@ -103,7 +103,7 @@
                         template: '<div><input type="text" :searchTerm="this.searchTerm" :value="this.searchTerm" :class="this.nightMode ? \'txtnight\' : \'txtday\'"><button class="btn btn-success btn-xs" v-on:click="searchMovieDB()">chercher</button></div>',
                         methods: {
                             searchMovieDB: function() {
-                                var API_KEY = '84961e500ed710e95eafa558a7aac318';
+                                var API_KEY = 'your_key';
                                 var query = '&query=' + this.searchTerm; 
                                 var url = this.movieDBurl + API_KEY + query + '&language=fr-FR';
 
@@ -213,6 +213,9 @@
 
     <style>
         .main {
+            width:90%;
+            margin-left: 20px;
+            margin-top: 20px;
             border: 6px solid rebeccapurple;
             padding: 10px;
             padding-bottom: 20px;
