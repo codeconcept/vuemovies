@@ -41,13 +41,13 @@
         <div v-for="(movie, index) in movies">
             <button v-on:click="deleteMovie(index)" 
                 class="btn btn-xs btn-danger" :style="">X</button> 
-            <span v-on:click="titleToSearchOnWikipedia = movie.title">
+            <span v-on:click="titleToSearchOnMovieDB = movie.title">
                 {{ movie.title }}
             </span> 
             {{ movie.year | recent | highlight }} 
         </div>    
 
-        <wikipedia-search :search-term="titleToSearchOnWikipedia" v-on:moviesreceived="displayMoviesFromAPI"></wikipedia-search>
+        <movie-db-search :search-term="titleToSearchOnMovieDB" v-on:moviesreceived="displayMoviesFromAPI"></movie-db-search>
         <div v-for="movie in moviesFromAPI">
             {{ movie }}
         </div>
@@ -81,21 +81,20 @@
                     // vueCreatorFullName: this.vueCreator.firstName + ' ' + this.creator.lastName  
                     newMovieTitle: '',
                     nightMode: false,
-                    titleToSearchOnWikipedia: '',
+                    titleToSearchOnMovieDB: '',
                     moviesFromAPI: []       
                 },
                 components: {
-                    'wikipedia-search': {
+                    'movie-db-search': {
                         data: function() {
                             return {
                                 movieDBurl: 'https://api.themoviedb.org/3/search/movie?api_key='
                                 
                             }
                         },
-                        template: '<div><input type="text" :searchTerm="this.searchTerm" :value="this.searchTerm"><button v-on:click="searchWikipedia()">chercher</button></div>',
+                        template: '<div><input type="text" :searchTerm="this.searchTerm" :value="this.searchTerm"><button v-on:click="searchMovieDB()">chercher</button></div>',
                         methods: {
-                            searchWikipedia: function() {
-                                // var url = 'https://fr.wikipedia.org/wiki/' + this.searchTerm;
+                            searchMovieDB: function() {
                                 var API_KEY = 'your_key';
                                 var query = '&query=' + this.searchTerm; 
                                 var url = this.movieDBurl + API_KEY + query + '&language=fr-FR';
