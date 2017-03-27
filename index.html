@@ -47,11 +47,19 @@
             {{ movie.year | recent | highlight }} 
         </div>    
 
-        <movie-db-search :search-term="titleToSearchOnMovieDB" v-on:moviesreceived="displayMoviesFromAPI"></movie-db-search>
-        <div v-for="movie in moviesFromAPI">
-            {{ movie }}
+        <movie-db-search 
+            :search-term="titleToSearchOnMovieDB" 
+            :night-mode="nightMode"
+            v-on:moviesreceived="displayMoviesFromAPI"></movie-db-search>
+        <div v-for="movie in moviesFromAPI">            
+            <movie-db-single-result 
+                :title="movie.title"
+                :img-name="movie.backdrop_path"
+                :overview="movie.overview"
+                ></movie-db-single-result>
         </div>
     </div>
+
     <script>
         'use strict';
 
@@ -92,10 +100,10 @@
                                 
                             }
                         },
-                        template: '<div><input type="text" :searchTerm="this.searchTerm" :value="this.searchTerm"><button v-on:click="searchMovieDB()">chercher</button></div>',
+                        template: '<div><input type="text" :searchTerm="this.searchTerm" :value="this.searchTerm" :class="this.nightMode ? \'txtnight\' : \'txtday\'"><button class="btn btn-success btn-xs" v-on:click="searchMovieDB()">chercher</button></div>',
                         methods: {
                             searchMovieDB: function() {
-                                var API_KEY = 'your_key';
+                                var API_KEY = '84961e500ed710e95eafa558a7aac318';
                                 var query = '&query=' + this.searchTerm; 
                                 var url = this.movieDBurl + API_KEY + query + '&language=fr-FR';
 
@@ -110,8 +118,17 @@
                                         });                            
                             }
                         },
-                        props: ['searchTerm']
-                    }
+                        props: ['searchTerm', 'nightMode']
+                    },
+                    'movie-db-single-result': {
+                        data: function() {
+                            return {
+                                imgUrl: 'https://image.tmdb.org/t/p/w500'
+                            }
+                        },
+                        template: '<div class="single-result"><h3>{{this.title}}</h3><img v-if="this.imgName" class="icon" :src="this.imgUrl + this.imgName">{{this.overview}}</div>',
+                        props: ['title', 'imgName', 'overview']
+                    },
                 },
                 methods: {
                     addMovie: function() {
@@ -132,7 +149,7 @@
                         return this.vueCreator.firstName + ' ' + this.vueCreator.lastName;
                     },
                     displayMoviesFromAPI: function(data) {
-                        console.log(data);
+                        // console.log(data);
                         this.moviesFromAPI = data;
                     }
                 },
@@ -220,6 +237,20 @@
         .txtnight {
             background-color: darkred;
             color: white;
+        }
+
+        .single-result {
+            min-height: 250px;
+            border: 2px solid purple;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .icon {
+            width: 200px;
+            margin-right: 10px;
+            margin-bottom: 5px;
+            float: left;
         }
     </style>
 </body>
