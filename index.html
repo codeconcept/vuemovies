@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <script src="https://unpkg.com/vue@2.2.5"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <title>Hello Vue.js</title>
+</head>
+<body>
+    <div id="app" class="main" :class="{night: nightMode}">  
+        <div>
+            <div>
+                <span class="checkbox checkbox-warning" :style="nightCheck">
+                    <input id="chknight" type="checkbox" v-model="nightMode">
+                    <label for="chknight" style="padding-left: 0px"> mode nuit </label>
+                </span>               
+                <small>Vue.js a été créé par {{ showCreatorFullName() }}</small> 
+            </div>
+            
+            <h2>Budget cinéma</h2>
+            <div>
+                budget ciné : {{ spendOnMovieTheater }} €
+            </div>
+            <div>
+                budget VOD : {{ spendOnVOD }} €
+            </div>
+        </div>
+        <br>
+        <hr>    
+        <input type="text" ref="movieTitle" v-model="newMovieTitle" 
+            placeholder="titre du film" :class="nightMode ? 'txtnight' : 'txtday'">  
+        <input type="text" ref="movieYear" v-on:keypress.enter="addMovie" :class="nightMode ? 'txtnight' : 'txtday'" 
+            placeholder="année" >  
+        <br><br>
+        <button v-on:click="addMovie" class="btn btn-xs btn-primary">ajouter</button>
+        <br><br>
+
+        <div v-for="(movie, index) in movies">
+            <button v-on:click="deleteMovie(index)" 
+                class="btn btn-xs btn-danger" :style="">X</button> 
+            {{ movie.title }} {{ movie.year | recent | highlight }} 
+        </div>    
+
+    </div>
+    <script>
+        'use strict';
+
+        var vm = new Vue({
+                el: '#app',
+                data: {
+                    movies: [
+                        {id: 1, title: 'Terminator', year: 1984},    	
+                        {id: 2, title: 'Fargo', year: 1984},
+                        {id: 3, title: 'Retour vers le Futur', year: 1985},    	
+                        {id: 4, title: 'Les figures de l\'ombre', year: 2016}
+                    ],
+                    moneyForVOD: 0,
+                    moneyForMovieTheater: 0,
+                    viewInHighDefinition: false,
+                    qualities: ['SD', 'HD'],
+                    dimensions: ['3D', '2D'],
+                    recentYear: 2016,
+                    ticketPrice: 5,
+                    vodPriceSD: 2.99,
+                    vodPriceHD: 3.99,
+                    vueCreator: {
+                        firstName: 'Evan',
+                        lastName: 'You'
+                    },
+                    //// KO needs to be done from methods because 'this' is not accessible yet 
+                    // vueCreatorFullName: this.vueCreator.firstName + ' ' + this.creator.lastName  
+                    newMovieTitle: '',
+                    nightMode: false
+                },
+                methods: {
+                    addMovie: function() {
+                        // var movieTitle = document.getElementById('movie-title');    	
+                        var movieTitle = this.$refs.movieTitle;
+                        var movieYear = this.$refs.movieYear;
+                        var id = this.movies.length + 1;
+                        this.movies.push({id: id, title: movieTitle.value, year: parseInt(movieYear.value, 10)});
+                        movieTitle.value = '';    
+                        this.newMovieTitle = '';  
+                        movieYear.value = '';
+                        movieTitle.focus();
+                    },
+                    deleteMovie: function(index) {
+                        this.movies.splice(index, 1);
+                    },
+                    showCreatorFullName: function() {
+                        return this.vueCreator.firstName + ' ' + this.vueCreator.lastName;
+                    }
+                },
+                computed: {
+                    spendOnVOD: function() {                    
+                        var self = this;
+                        var oldMovies = this.movies.filter(function(movie){  
+                            // console.log('this', this);
+                            return movie.year < self.recentYear;
+                        });
+                        return oldMovies.length * this.vodPriceSD;
+                    },
+                    spendOnMovieTheater: function() {
+                        var self = this;
+                        var newMovies = this.movies.filter(function(movie){
+                            return movie.year >= self.recentYear;
+                        });
+                        return newMovies.length * this.ticketPrice;
+                    },
+                    nightCheck: function() {
+                        return {
+                                    width: 200 + 'px',
+                                    paddingLeft: 20 + 'px'
+                        }
+                    }
+                },
+                watch: {
+                    newMovieTitle: function(newValue) {
+                        if(newValue.toLowerCase() === 'terminator') {
+                            alert('tata ta tata');
+                        }
+                    },
+                    nightMode: function(newValue) {
+                        if(newValue) {
+
+                        }
+                    }
+                },
+                filters: {
+                    recent: function(year) {
+                        var recentYear = 2016;
+                        if(year >= recentYear ) {
+                            var newVal = year + ' (nouveau)';
+                            return newVal;
+                        } else {
+                            return year;
+                        }
+                    },
+                    highlight: function(value) {
+                        var newVal = '';
+                        var regex = /nouveau/;
+                        if(regex.test(value)) {
+                            newVal = value + ' à voir au ciné';
+                        } else {
+                            newVal = value + ' à louer'
+                        }
+                        return newVal;
+                    }
+                }
+            });
+    </script>
+
+    <style>
+        .main {
+            border: 6px solid rebeccapurple;
+            padding: 10px;
+            padding-bottom: 20px;
+            border-radius: 10px;
+            color: rebeccapurple;
+        }
+
+        div {
+            padding-bottom: 3px;
+        }
+
+        .txtday {
+            background-color: peachpuff;
+            color: green;
+        }
+
+        .night {
+            background-color: black;
+            color: white;
+        }
+
+        .txtnight {
+            background-color: darkred;
+            color: white;
+        }
+    </style>
+</body>
+</html>
