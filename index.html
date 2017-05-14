@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://unpkg.com/axios@0.15.3/dist/axios.min.js"></script>
+  <script src="./config.js"></script>
   <title>Hello Vue.js</title>
 </head>
 <body>
@@ -43,7 +44,7 @@
                 class="btn btn-xs btn-danger" :style="">X</button> 
             <span v-on:click="titleToSearchOnMovieDB = movie.title">
                 {{ movie.title }}
-            </span> 
+            </span>
             {{ movie.year | recent | highlight }} 
         </div>    
 
@@ -90,21 +91,21 @@
                     newMovieTitle: '',
                     nightMode: false,
                     titleToSearchOnMovieDB: '',
-                    moviesFromAPI: []       
+                    moviesFromAPI: []
                 },
                 components: {
                     'movie-db-search': {
                         data: function() {
                             return {
-                                movieDBurl: 'https://api.themoviedb.org/3/search/movie?api_key='
-                                
+                                movieDBurl: 'https://api.themoviedb.org/3/search/movie?api_key=',
+                                movieTitleToSearch: ''                                
                             }
                         },
-                        template: '<div><input type="text" :searchTerm="this.searchTerm" :value="this.searchTerm" :class="this.nightMode ? \'txtnight\' : \'txtday\'"><button class="btn btn-success btn-xs" v-on:click="searchMovieDB()">chercher</button></div>',
+                        template: '<div><input type="text" :searchTerm="this.searchTerm" v-model="movieTitleToSearch" :class="this.nightMode ? \'txtnight\' : \'txtday\'"><button class="btn btn-success btn-xs" v-on:click="searchMovieDB()">chercher</button></div>',
                         methods: {
                             searchMovieDB: function() {
-                                var API_KEY = 'your_key';
-                                var query = '&query=' + this.searchTerm; 
+                                var API_KEY = moviedb_api_key; console.log('API_KEY: ', API_KEY);
+                                var query = '&query=' + this.movieTitleToSearch;
                                 var url = this.movieDBurl + API_KEY + query + '&language=fr-FR';
 
                                 var self = this;
